@@ -4,6 +4,7 @@ import java.io.*
 import java.lang.IllegalStateException
 import kotlin.system.exitProcess
 
+val astStringer = AstStringer()
 val interpreter = Interpreter()
 
 fun main(args: Array<String>) {
@@ -22,10 +23,9 @@ private fun run(source: String): Boolean {
     var hadErrors = hadLexerErrors(tokens)
     try {
         val ast = Parser(tokens).parse()
-        println(AstStringer().stringify(ast))
+        println(astStringer.stringify(ast))
         if (!hadErrors) {
-            val result = interpreter.evaluate(ast)
-            println(result)
+            println(interpreter.evaluate(ast))
         }
     }
     catch (e: Parser.ParseException) {
