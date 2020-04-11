@@ -17,7 +17,8 @@ fun main(args: Array<String>) {
 
 private fun run(source: String) {
     val tokens = Lexer(source).lex()
-    println(tokens)
+    val ast = Parser(tokens).parse()
+    println(AstStringer().stringify(ast))
 }
 
 private fun repl() {
