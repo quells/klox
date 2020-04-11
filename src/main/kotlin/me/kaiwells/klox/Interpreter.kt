@@ -2,8 +2,8 @@ package me.kaiwells.klox
 
 import me.kaiwells.klox.Token.Type.*
 
-class Interpreter(private val ast: Expr) : Expr.Visitor<Any?> {
-    fun evaluate(): Any? {
+class Interpreter() : Expr.Visitor<Any?> {
+    fun evaluate(ast: Expr): Any? {
         return ast.accept(this)
     }
 

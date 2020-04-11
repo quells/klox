@@ -4,6 +4,8 @@ import java.io.*
 import java.lang.IllegalStateException
 import kotlin.system.exitProcess
 
+val interpreter = Interpreter()
+
 fun main(args: Array<String>) {
     when (args.size) {
         0 -> repl()
@@ -22,7 +24,7 @@ private fun run(source: String): Boolean {
         val ast = Parser(tokens).parse()
         println(AstStringer().stringify(ast))
         if (!hadErrors) {
-            val result = Interpreter(ast).evaluate()
+            val result = interpreter.evaluate(ast)
             println(result)
         }
     }
