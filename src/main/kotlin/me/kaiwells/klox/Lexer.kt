@@ -91,6 +91,8 @@ class Lexer(private val source: String) {
             '+' -> addToken(Plus)
             '-' -> addToken(Minus)
             '*' -> addToken(Star)
+            '?' -> addToken(Question)
+            ':' -> addToken(Colon)
             '!' -> if (match('=')) addToken(BangEqual) else addToken(Bang)
             '=' -> if (match('=')) addToken(EqualEqual) else addToken(Equal)
             '<' -> if (match('=')) addToken(LessEqual) else addToken(Less)

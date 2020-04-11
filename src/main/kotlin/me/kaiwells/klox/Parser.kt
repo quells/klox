@@ -91,7 +91,19 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun expression(): Expr {
-        return equality()
+        return ternary()
+    }
+
+    private fun ternary(): Expr {
+        val expr = equality()
+        if (match(Question)) {
+            val q = previous()
+            val l = equality()
+            val c = consume(Colon, "expected ':' in ternary")
+            val r = expression()
+            return Expr.Ternary(expr, q, l, c, r)
+        }
+        return expr
     }
 
     private fun equality(): Expr {
@@ -149,6 +161,7 @@ class Parser(private val tokens: List<Token>) {
             match(True) -> Expr.Literal(true)
             match(Nil) -> Expr.Literal(null)
             match(Number, Token.Type.String) -> Expr.Literal(previous().literal)
+            match(Identifier) -> Expr.Variable(previous())
             match(LeftParen) -> {
                 val e = expression()
                 consume(RightParen, "expected ')' after expression")

@@ -8,7 +8,7 @@ data class Token(
     val column: Int = 0
 ) {
     enum class Type {
-        LeftParen, RightParen, LeftBrace, RightBrace, Comma, Dot, Semicolon, Plus, Minus, Star, Slash,
+        LeftParen, RightParen, LeftBrace, RightBrace, Comma, Dot, Semicolon, Plus, Minus, Star, Slash, Question, Colon,
         Bang, BangEqual,
         Equal, EqualEqual,
         Greater, GreaterEqual,

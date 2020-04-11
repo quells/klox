@@ -11,6 +11,7 @@ abstract class Expr {
         fun visitLogical(expr: Logical): R
         fun visitSet(expr: Set): R
         fun visitSuper(expr: Super): R
+        fun visitTernary(expr: Ternary): R
         fun visitThis(expr: This): R
         fun visitUnary(expr: Unary): R
         fun visitVariable(expr: Variable): R
@@ -61,6 +62,11 @@ abstract class Expr {
     data class Super(val keyword: Token, val method: Token) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitSuper(this)
+        }
+    }
+    data class Ternary(val condition: Expr, val q: Token, val left: Expr, val c: Token, val right: Expr) : Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitTernary(this)
         }
     }
     data class This(val keyword: Token) : Expr() {

@@ -54,6 +54,9 @@ class AstStringer : Expr.Visitor<String> {
     override fun visitSuper(expr: Expr.Super): String {
         return parenthesize(expr.keyword.lexeme, expr.method, emptyList())
     }
+    override fun visitTernary(expr: Expr.Ternary): String {
+        return parenthesize(expr.q.lexeme, listOf(expr.condition, expr.left, expr.right))
+    }
     override fun visitThis(expr: Expr.This): String {
         return expr.keyword.lexeme
     }
