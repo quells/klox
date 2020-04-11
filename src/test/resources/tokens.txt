@@ -1,0 +1,15 @@
+// this is a comment
+(( ){} // grouping stuff
+!*+-/=<> <= >= == != // operators
+"a man a plan a canal panama" // string
+"four score
+and seven years ago" // multi-line string
+0123
+3.14
+and class else false for fun if nil or print return super this true var while
+_identify_THIS_9001
+///* this is not a block comment
+/* this is
+a block comment
+/* with nested blocks */*/
+" // it goes on an on and on and
