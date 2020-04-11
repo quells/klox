@@ -15,10 +15,29 @@ fun main(args: Array<String>) {
     }
 }
 
-private fun run(source: String) {
+private fun run(source: String): Boolean {
     val tokens = Lexer(source).lex()
-    val ast = Parser(tokens).parse()
-    println(AstStringer().stringify(ast))
+    var hadErrors = hadLexerErrors(tokens)
+    try {
+        val ast = Parser(tokens).parse()
+        println(AstStringer().stringify(ast))
+    }
+    catch (e: Parser.ParseException) {
+        println(e.message)
+        hadErrors = true
+    }
+    return hadErrors
+}
+
+private fun hadLexerErrors(tokens: List<Token>): Boolean {
+    var hadErrors = false
+    for (t in tokens) {
+        if (t.type == Token.Type.Error) {
+            hadErrors = true
+            println("[${t.line}:${t.column}] Error: ${t.literal}")
+        }
+    }
+    return hadErrors
 }
 
 private fun repl() {
@@ -38,5 +57,7 @@ private fun repl() {
 
 private fun runFile(filepath: String) {
     val source = File(filepath).readText(Charsets.UTF_8)
-    run(source)
+    if (run(source)) {
+        exitProcess(65)
+    }
 }
