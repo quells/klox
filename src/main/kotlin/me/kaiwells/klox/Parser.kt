@@ -107,7 +107,7 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun equality(): Expr {
-        var expr = comparison();
+        var expr = comparison()
         while (match(BangEqual, EqualEqual)) {
             val op = previous()
             val right = comparison()
@@ -117,7 +117,7 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun comparison(): Expr {
-        var expr = addition();
+        var expr = addition()
         while (match(Greater, GreaterEqual, Less, LessEqual)) {
             val op = previous()
             val right = addition()
@@ -127,7 +127,7 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun addition(): Expr {
-        var expr = multiplication();
+        var expr = multiplication()
         while (match(Plus, Minus)) {
             val op = previous()
             val right = multiplication()
@@ -137,7 +137,7 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun multiplication(): Expr {
-        var expr = unary();
+        var expr = unary()
         while (match(Star, Slash)) {
             val op = previous()
             val right = unary()
@@ -168,7 +168,7 @@ class Parser(private val tokens: List<Token>) {
                 Expr.Grouping(e)
             }
             else -> {
-                throw ParseException("expected one of false, true, nil, NUMBER, STRING, ( for expression")
+                throw ParseException("expected one of false, true, nil, NUMBER, STRING, VARIABLE ( for expression")
             }
         }
     }
