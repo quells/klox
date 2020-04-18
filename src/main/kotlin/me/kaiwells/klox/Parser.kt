@@ -10,13 +10,13 @@ class Parser(private val tokens: List<Token>) {
             val e = expression()
             if (!atEnd()) {
                 val t = peek()
-                throw ParseException("[${t.line}:${t.column}] Error: unused tokens found after parsing: ${tokens.subList(current, tokens.size)}")
+                throw ParseException("[${t.line}:${t.column}] Error: unused tokens found after parsing: ${tokens.subList(current, tokens.size)}", peek())
             } else {
                 e
             }
         } catch (e: ParseException) {
             val t = peek()
-            throw ParseException("[${t.line}:${t.column}] Error: ${e.message}, found ${t.type}")
+            throw ParseException("[${t.line}:${t.column}] Error: ${e.message}, found ${t.type}", peek())
         }
     }
 
@@ -66,7 +66,7 @@ class Parser(private val tokens: List<Token>) {
         if (check(expected)) {
             return advance()
         }
-        throw ParseException("expected $expected")
+        throw ParseException("expected $expected", peek())
     }
 
     private fun synchronize() {
@@ -168,10 +168,10 @@ class Parser(private val tokens: List<Token>) {
                 Expr.Grouping(e)
             }
             else -> {
-                throw ParseException("expected one of false, true, nil, NUMBER, STRING, VARIABLE ( for expression")
+                throw ParseException("expected one of false, true, nil, NUMBER, STRING, VARIABLE, ( for expression", peek())
             }
         }
     }
 
-    class ParseException(msg: String) : RuntimeException(msg)
+    class ParseException(msg: String, val token: Token) : RuntimeException(msg)
 }

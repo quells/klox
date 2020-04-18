@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
 
 private fun run(source: String): Boolean {
     val tokens = Lexer(source).lex()
-    var hadErrors = hadLexerErrors(tokens)
+    var hadErrors = hadLexerErrors(source, tokens)
     try {
         val ast = Parser(tokens).parse()
         println(astStringer.stringify(ast))
@@ -29,21 +29,46 @@ private fun run(source: String): Boolean {
         }
     }
     catch (e: Parser.ParseException) {
-        println(e.message)
+        handleParserError(source, e)
         hadErrors = true
     }
     return hadErrors
 }
 
-private fun hadLexerErrors(tokens: List<Token>): Boolean {
+private fun hadLexerErrors(source: String, tokens: List<Token>): Boolean {
     var hadErrors = false
+    val lines = source.split('\n')
     for (t in tokens) {
         if (t.type == Token.Type.Error) {
             hadErrors = true
-            println("[${t.line}:${t.column}] Error: ${t.literal}")
+            println(lines[t.line - 1])
+            val leadingSpaceSize = t.column - 1
+            var leadingSpace = " ".repeat(leadingSpaceSize)
+            println("${leadingSpace}^")
+            val msg = "[${t.line}:${t.column}] ${t.literal}"
+            if (msg.length <= leadingSpaceSize) {
+                leadingSpace = " ".repeat(leadingSpaceSize - msg.length + 1)
+            }
+            println("$leadingSpace$msg")
         }
     }
     return hadErrors
+}
+
+private fun handleParserError(source: String, e: Parser.ParseException) {
+    val lines = source.split('\n')
+    val line = when (e.token.type) {
+        Token.Type.EOF -> lines.last()
+        else -> lines[e.token.line - 1]
+    }
+    println(line)
+    val leadingSpaceSize = when (e.token.type) {
+        Token.Type.EOF -> 0
+        else -> e.token.column - 1
+    }
+    val leadingSpace = " ".repeat(leadingSpaceSize)
+    println("$leadingSpace^")
+    println(e.message)
 }
 
 private fun repl() {
