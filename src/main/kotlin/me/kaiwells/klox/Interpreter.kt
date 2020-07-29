@@ -45,7 +45,9 @@ class Interpreter (
     }
 
     override fun visitAssign(expr: Expr.Assign): Any? {
-        TODO("Not yet implemented")
+        val value = eval(expr.value)
+        env.assign(expr.name, value)
+        return value
     }
 
     override fun visitBinary(expr: Expr.Binary): Any? {
