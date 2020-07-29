@@ -93,6 +93,7 @@ class Parser(private val tokens: List<Token>) {
             if (match(Var)) varDeclaration() else statement()
         } catch (ex: Error) {
             synchronize()
+            TODO("report error without throwing")
             null
         }
     }
@@ -105,13 +106,26 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun statement(): Stmt {
-        return if (match(Print)) printStatement() else expressionStatement()
+        return when {
+            match(Print) -> printStatement()
+            match(LeftBrace) -> Stmt.Block(block())
+            else -> expressionStatement()
+        }
     }
 
     private fun printStatement(): Stmt {
         val value = expression()
         consume(Semicolon, "after value")
         return Stmt.Print(value)
+    }
+
+    private fun block(): List<Stmt> {
+        val statements = mutableListOf<Stmt>()
+        while (!check(RightBrace) && !atEnd()) {
+            declaration()?.let { statements.add(it) }
+        }
+        consume(RightBrace, "after block")
+        return statements
     }
 
     private fun expressionStatement(): Stmt {

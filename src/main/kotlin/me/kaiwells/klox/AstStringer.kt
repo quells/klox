@@ -2,11 +2,7 @@ package me.kaiwells.klox
 
 class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
     fun stringify(statements: List<Stmt>): String {
-        val builder = StringBuilder()
-        statements.forEach {
-            builder.append(it.accept(this)).append('\n')
-        }
-        return builder.toString()
+        return statements.joinToString(" ") { it.accept(this) }
     }
 
     private fun parenthesize(name: String, exprs: List<Expr>): String {
@@ -76,7 +72,11 @@ class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
     /* Stmt.Visitor<String> */
 
     override fun visitBlock(stmt: Stmt.Block): String {
-        TODO("Not yet implemented")
+        val builder = StringBuilder()
+        builder.append("{ ")
+        builder.append(stmt.statements.joinToString(" ") { it.accept(this) })
+        builder.append(" }")
+        return builder.toString()
     }
     override fun visitClass(stmt: Stmt.Class): String {
         TODO("Not yet implemented")

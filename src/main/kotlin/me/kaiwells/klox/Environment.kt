@@ -1,7 +1,8 @@
 package me.kaiwells.klox
 
 data class Environment (
-        private val values: MutableMap<String, Any?> = mutableMapOf()
+        private val values: MutableMap<String, Any?> = mutableMapOf(),
+        private val enclosing: Environment? = null
 ) {
 
     fun define(name: String, value: Any?) {
@@ -13,14 +14,14 @@ data class Environment (
         if (values.containsKey(key)) {
             values[key] = value
         } else {
-            throw undef(name)
+            enclosing?.assign(name, value) ?: throw undef(name)
         }
     }
 
     fun get(name: Token): Any? {
         val key = name.lexeme
         return if (values.containsKey(key)) values[key] else
-            throw undef(name)
+            enclosing?.get(name) ?: throw undef(name)
     }
 
     private fun undef(name: Token): Interpreter.Error {

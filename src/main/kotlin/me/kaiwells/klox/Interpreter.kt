@@ -3,7 +3,7 @@ package me.kaiwells.klox
 import me.kaiwells.klox.Token.Type.*
 
 class Interpreter (
-        private val env: Environment = Environment()
+        private var env: Environment = Environment()
 ) : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
 
     fun interpret(statements: List<Stmt>) {
@@ -131,7 +131,17 @@ class Interpreter (
     /* Stmt.Visitor<Unit> */
 
     override fun visitBlock(stmt: Stmt.Block) {
-        TODO("Not yet implemented")
+        executeBlock(stmt.statements, Environment(enclosing = env))
+    }
+
+    private fun executeBlock(statements: List<Stmt>, inner: Environment) {
+        val outer = env
+        try {
+            env = inner
+            statements.forEach { execute(it) }
+        } finally {
+            env = outer
+        }
     }
 
     override fun visitClass(stmt: Stmt.Class) {
