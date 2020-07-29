@@ -9,12 +9,12 @@ class Parser(private val tokens: List<Token>) {
         return try {
             val statements = mutableListOf<Stmt>()
             while (!atEnd()) {
-                statements.add(statement())
+                declaration()?.let { statements.add(it) }
             }
             statements
-        } catch (e: ParseException) {
+        } catch (e: Error) {
             val t = peek()
-            throw ParseException("[${t.line}:${t.column}] Error: ${e.message}, found ${t.type}", peek())
+            throw Error("[${t.line}:${t.column}] Error: ${e.message}, found ${t.type}", peek())
         }
     }
 
@@ -64,7 +64,7 @@ class Parser(private val tokens: List<Token>) {
         if (check(expected)) {
             return advance()
         }
-        throw ParseException("expected $expected $msg", peek())
+        throw Error("expected $expected $msg", peek())
     }
 
     private fun synchronize() {
@@ -86,6 +86,22 @@ class Parser(private val tokens: List<Token>) {
                 else -> advance()
             }
         }
+    }
+
+    private fun declaration(): Stmt? {
+        return try {
+            if (match(Var)) varDeclaration() else statement()
+        } catch (ex: Error) {
+            synchronize()
+            null
+        }
+    }
+
+    private fun varDeclaration(): Stmt {
+        val name = consume(Identifier, "for variable name")
+        val initializer = if (match(Equal)) expression() else null
+        consume(Semicolon, "after variable declaration")
+        return Stmt.Variable(name, initializer)
     }
 
     private fun statement(): Stmt {
@@ -182,10 +198,10 @@ class Parser(private val tokens: List<Token>) {
                 Expr.Grouping(e)
             }
             else -> {
-                throw ParseException("expected one of false, true, nil, NUMBER, STRING, VARIABLE, ( for expression", peek())
+                throw Error("expected one of false, true, nil, NUMBER, STRING, VARIABLE, ( for expression", peek())
             }
         }
     }
 
-    class ParseException(msg: String, val token: Token) : RuntimeException(msg)
+    class Error(msg: String, val token: Token) : RuntimeException(msg)
 }

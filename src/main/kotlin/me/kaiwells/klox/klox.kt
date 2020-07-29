@@ -28,7 +28,7 @@ private fun run(source: String): Boolean {
             interpreter.interpret(ast)
         }
     }
-    catch (e: Parser.ParseException) {
+    catch (e: Parser.Error) {
         handleParserError(source, e)
         hadErrors = true
     }
@@ -55,7 +55,7 @@ private fun hadLexerErrors(source: String, tokens: List<Token>): Boolean {
     return hadErrors
 }
 
-private fun handleParserError(source: String, e: Parser.ParseException) {
+private fun handleParserError(source: String, e: Parser.Error) {
     val lines = source.split('\n')
     val line = when (e.token.type) {
         Token.Type.EOF -> lines.last()

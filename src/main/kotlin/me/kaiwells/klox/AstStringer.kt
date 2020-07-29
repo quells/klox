@@ -99,7 +99,11 @@ class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
         TODO("Not yet implemented")
     }
     override fun visitVariable(stmt: Stmt.Variable): String {
-        TODO("Not yet implemented")
+        val builder = StringBuilder()
+        builder.append("var ").append(stmt.name.lexeme)
+        stmt.initializer?.let { builder.append(" = ").append(it.accept(this)) }
+        builder.append(';')
+        return builder.toString()
     }
     override fun visitWhile(stmt: Stmt.While): String {
         TODO("Not yet implemented")

@@ -50,7 +50,7 @@ abstract class Stmt {
             return visitor.visitReturn(this)
         }
     }
-    data class Variable(val name: Token, val initializer: Expr) : Stmt() {
+    data class Variable(val name: Token, val initializer: Expr?) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitVariable(this)
         }

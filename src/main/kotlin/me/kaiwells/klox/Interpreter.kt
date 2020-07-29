@@ -2,7 +2,9 @@ package me.kaiwells.klox
 
 import me.kaiwells.klox.Token.Type.*
 
-class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
+class Interpreter (
+        private val env: Environment = Environment()
+) : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
 
     fun interpret(statements: List<Stmt>) {
         statements.forEach { execute(it) }
@@ -121,7 +123,7 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     }
 
     override fun visitVariable(expr: Expr.Variable): Any? {
-        TODO("Not yet implemented")
+        return env.get(expr.name)
     }
 
     /* Stmt.Visitor<Unit> */
@@ -156,10 +158,13 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
     }
 
     override fun visitVariable(stmt: Stmt.Variable) {
-        TODO("Not yet implemented")
+        val initializer = stmt.initializer?.let { eval(it) }
+        env.define(stmt.name.lexeme, initializer)
     }
 
     override fun visitWhile(stmt: Stmt.While) {
         TODO("Not yet implemented")
     }
+
+    class Error(msg: String, val token: Token) : RuntimeException(msg)
 }
