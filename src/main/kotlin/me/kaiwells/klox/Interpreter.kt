@@ -4,14 +4,16 @@ import me.kaiwells.klox.Token.Type.*
 
 class Interpreter (
         private var env: Environment = Environment()
-) : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
+) : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
 
-    fun interpret(statements: List<Stmt>) {
-        statements.forEach { execute(it) }
+    fun interpret(statements: List<Stmt>): Any? {
+        // return the result of the last statement
+        val acc: Any? = null
+        return statements.fold(acc) { _, stmt -> execute(stmt) }
     }
 
-    private fun execute(stmt: Stmt) {
-        stmt.accept(this)
+    private fun execute(stmt: Stmt): Any? {
+        return stmt.accept(this)
     }
 
     /* Expr.Visitor<Any?> */
@@ -128,10 +130,11 @@ class Interpreter (
         return env.get(expr.name)
     }
 
-    /* Stmt.Visitor<Unit> */
+    /* Stmt.Visitor<Any?> */
 
-    override fun visitBlock(stmt: Stmt.Block) {
+    override fun visitBlock(stmt: Stmt.Block): Any? {
         executeBlock(stmt.statements, Environment(enclosing = env))
+        return null
     }
 
     private fun executeBlock(statements: List<Stmt>, inner: Environment) {
@@ -144,37 +147,39 @@ class Interpreter (
         }
     }
 
-    override fun visitClass(stmt: Stmt.Class) {
+    override fun visitClass(stmt: Stmt.Class): Any? {
         TODO("Not yet implemented")
     }
 
-    override fun visitExpression(stmt: Stmt.Expression) {
-        eval(stmt.expression)
+    override fun visitExpression(stmt: Stmt.Expression): Any? {
+        return eval(stmt.expression)
     }
 
-    override fun visitFunction(stmt: Stmt.Function) {
+    override fun visitFunction(stmt: Stmt.Function): Any? {
         TODO("Not yet implemented")
     }
 
-    override fun visitIf(stmt: Stmt.If) {
+    override fun visitIf(stmt: Stmt.If): Any? {
         TODO("Not yet implemented")
     }
 
-    override fun visitPrint(stmt: Stmt.Print) {
+    override fun visitPrint(stmt: Stmt.Print): Any? {
         val value = eval(stmt.expression)
         println(value)
+        return null
     }
 
-    override fun visitReturn(stmt: Stmt.Return) {
+    override fun visitReturn(stmt: Stmt.Return): Any? {
         TODO("Not yet implemented")
     }
 
-    override fun visitVariable(stmt: Stmt.Variable) {
+    override fun visitVariable(stmt: Stmt.Variable): Any? {
         val initializer = stmt.initializer?.let { eval(it) }
         env.define(stmt.name.lexeme, initializer)
+        return initializer
     }
 
-    override fun visitWhile(stmt: Stmt.While) {
+    override fun visitWhile(stmt: Stmt.While): Any? {
         TODO("Not yet implemented")
     }
 

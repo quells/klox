@@ -93,7 +93,6 @@ class Parser(private val tokens: List<Token>) {
             if (match(Var)) varDeclaration() else statement()
         } catch (ex: Error) {
             synchronize()
-            TODO("report error without throwing")
             null
         }
     }

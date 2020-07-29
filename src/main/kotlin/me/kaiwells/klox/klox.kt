@@ -18,14 +18,16 @@ fun main(args: Array<String>) {
     }
 }
 
-private fun run(source: String): Boolean {
+private fun run(source: String, repl: Boolean = false): Boolean {
     val tokens = Lexer(source).lex()
     var hadErrors = hadLexerErrors(source, tokens)
     try {
         val ast = Parser(tokens).parse()
         println(astStringer.stringify(ast))
         if (!hadErrors) {
-            interpreter.interpret(ast)
+            interpreter.interpret(ast)?.let {
+                if (repl) println(it)
+            }
         }
     }
     catch (e: Parser.Error) {
