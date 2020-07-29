@@ -108,7 +108,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun equality(): Expr {
         var expr = comparison()
-        while (match(BangEqual, EqualEqual)) {
+        if (match(BangEqual, EqualEqual)) {
             val op = previous()
             val right = comparison()
             expr = Expr.Binary(expr, op, right)
@@ -118,7 +118,7 @@ class Parser(private val tokens: List<Token>) {
 
     private fun comparison(): Expr {
         var expr = addition()
-        while (match(Greater, GreaterEqual, Less, LessEqual)) {
+        if (match(Greater, GreaterEqual, Less, LessEqual)) {
             val op = previous()
             val right = addition()
             expr = Expr.Binary(expr, op, right)

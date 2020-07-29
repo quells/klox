@@ -30,6 +30,7 @@ class Interpreter() : Expr.Visitor<Any?> {
             left == null && right == null -> true
             left is Double && right is Double -> left == right
             left is String && right is String -> left == right
+            left is Boolean && right is Boolean -> left == right
             else -> false
         }
     }
