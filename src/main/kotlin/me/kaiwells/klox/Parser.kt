@@ -5,15 +5,13 @@ import me.kaiwells.klox.Token.Type.*
 class Parser(private val tokens: List<Token>) {
     private var current = 0
 
-    fun parse(): Expr {
+    fun parse(): List<Stmt> {
         return try {
-            val e = expression()
-            if (!atEnd()) {
-                val t = peek()
-                throw ParseException("[${t.line}:${t.column}] Error: unused tokens found after parsing: ${tokens.subList(current, tokens.size)}", peek())
-            } else {
-                e
+            val statements = mutableListOf<Stmt>()
+            while (!atEnd()) {
+                statements.add(statement())
             }
+            statements
         } catch (e: ParseException) {
             val t = peek()
             throw ParseException("[${t.line}:${t.column}] Error: ${e.message}, found ${t.type}", peek())
@@ -66,7 +64,7 @@ class Parser(private val tokens: List<Token>) {
         if (check(expected)) {
             return advance()
         }
-        throw ParseException("expected $expected", peek())
+        throw ParseException("expected $expected $msg", peek())
     }
 
     private fun synchronize() {
@@ -90,6 +88,22 @@ class Parser(private val tokens: List<Token>) {
         }
     }
 
+    private fun statement(): Stmt {
+        return if (match(Print)) printStatement() else expressionStatement()
+    }
+
+    private fun printStatement(): Stmt {
+        val value = expression()
+        consume(Semicolon, "after value")
+        return Stmt.Print(value)
+    }
+
+    private fun expressionStatement(): Stmt {
+        val value = expression()
+        consume(Semicolon, "after value")
+        return Stmt.Expression(value)
+    }
+
     private fun expression(): Expr {
         return ternary()
     }
@@ -99,7 +113,7 @@ class Parser(private val tokens: List<Token>) {
         if (match(Question)) {
             val q = previous()
             val l = equality()
-            val c = consume(Colon, "expected ':' in ternary")
+            val c = consume(Colon, "in ternary")
             val r = expression()
             return Expr.Ternary(expr, q, l, c, r)
         }
@@ -164,7 +178,7 @@ class Parser(private val tokens: List<Token>) {
             match(Identifier) -> Expr.Variable(previous())
             match(LeftParen) -> {
                 val e = expression()
-                consume(RightParen, "expected ')' after expression")
+                consume(RightParen, "after expression")
                 Expr.Grouping(e)
             }
             else -> {

@@ -25,7 +25,7 @@ private fun run(source: String): Boolean {
         val ast = Parser(tokens).parse()
         println(astStringer.stringify(ast))
         if (!hadErrors) {
-            println(interpreter.evaluate(ast))
+            interpreter.interpret(ast)
         }
     }
     catch (e: Parser.ParseException) {

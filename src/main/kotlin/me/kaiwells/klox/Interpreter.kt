@@ -2,10 +2,17 @@ package me.kaiwells.klox
 
 import me.kaiwells.klox.Token.Type.*
 
-class Interpreter() : Expr.Visitor<Any?> {
-    fun evaluate(ast: Expr): Any? {
-        return ast.accept(this)
+class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Unit> {
+
+    fun interpret(statements: List<Stmt>) {
+        statements.forEach { execute(it) }
     }
+
+    private fun execute(stmt: Stmt) {
+        stmt.accept(this)
+    }
+
+    /* Expr.Visitor<Any?> */
 
     private fun eval(expr: Expr): Any? {
         return expr.accept(this)
@@ -114,6 +121,45 @@ class Interpreter() : Expr.Visitor<Any?> {
     }
 
     override fun visitVariable(expr: Expr.Variable): Any? {
+        TODO("Not yet implemented")
+    }
+
+    /* Stmt.Visitor<Unit> */
+
+    override fun visitBlock(stmt: Stmt.Block) {
+        TODO("Not yet implemented")
+    }
+
+    override fun visitClass(stmt: Stmt.Class) {
+        TODO("Not yet implemented")
+    }
+
+    override fun visitExpression(stmt: Stmt.Expression) {
+        eval(stmt.expression)
+    }
+
+    override fun visitFunction(stmt: Stmt.Function) {
+        TODO("Not yet implemented")
+    }
+
+    override fun visitIf(stmt: Stmt.If) {
+        TODO("Not yet implemented")
+    }
+
+    override fun visitPrint(stmt: Stmt.Print) {
+        val value = eval(stmt.expression)
+        println(value)
+    }
+
+    override fun visitReturn(stmt: Stmt.Return) {
+        TODO("Not yet implemented")
+    }
+
+    override fun visitVariable(stmt: Stmt.Variable) {
+        TODO("Not yet implemented")
+    }
+
+    override fun visitWhile(stmt: Stmt.While) {
         TODO("Not yet implemented")
     }
 }

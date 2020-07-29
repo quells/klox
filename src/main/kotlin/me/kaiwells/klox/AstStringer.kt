@@ -1,8 +1,12 @@
 package me.kaiwells.klox
 
-class AstStringer : Expr.Visitor<String> {
-    fun stringify(expr: Expr): String {
-        return expr.accept(this)
+class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
+    fun stringify(statements: List<Stmt>): String {
+        val builder = StringBuilder()
+        statements.forEach {
+            builder.append(it.accept(this)).append('\n')
+        }
+        return builder.toString()
     }
 
     private fun parenthesize(name: String, exprs: List<Expr>): String {
@@ -24,6 +28,8 @@ class AstStringer : Expr.Visitor<String> {
         builder.append(")")
         return builder.toString()
     }
+
+    /* Expr.Visitor<String> */
 
     override fun visitAssign(expr: Expr.Assign): String {
         return parenthesize("assign", expr.name, listOf(expr.value))
@@ -65,5 +71,37 @@ class AstStringer : Expr.Visitor<String> {
     }
     override fun visitVariable(expr: Expr.Variable): String {
         return expr.name.lexeme
+    }
+
+    /* Stmt.Visitor<String> */
+
+    override fun visitBlock(stmt: Stmt.Block): String {
+        TODO("Not yet implemented")
+    }
+    override fun visitClass(stmt: Stmt.Class): String {
+        TODO("Not yet implemented")
+    }
+    override fun visitExpression(stmt: Stmt.Expression): String {
+        return stmt.expression.accept(this) + ";"
+    }
+    override fun visitFunction(stmt: Stmt.Function): String {
+        TODO("Not yet implemented")
+    }
+    override fun visitIf(stmt: Stmt.If): String {
+        TODO("Not yet implemented")
+    }
+    override fun visitPrint(stmt: Stmt.Print): String {
+        val builder = StringBuilder()
+        builder.append("print ").append(stmt.expression.accept(this)).append(';')
+        return builder.toString()
+    }
+    override fun visitReturn(stmt: Stmt.Return): String {
+        TODO("Not yet implemented")
+    }
+    override fun visitVariable(stmt: Stmt.Variable): String {
+        TODO("Not yet implemented")
+    }
+    override fun visitWhile(stmt: Stmt.While): String {
+        TODO("Not yet implemented")
     }
 }
