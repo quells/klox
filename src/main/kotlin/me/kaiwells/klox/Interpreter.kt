@@ -108,9 +108,7 @@ class Interpreter (
 
     override fun visitTernary(expr: Expr.Ternary): Any? {
         val condition = eval(expr.condition)
-        val left = eval(expr.left)
-        val right = eval(expr.right)
-        return if (isTruthy(condition)) left else right
+        return if (isTruthy(condition)) eval(expr.left) else eval(expr.right)
     }
 
     override fun visitThis(expr: Expr.This): Any? {
