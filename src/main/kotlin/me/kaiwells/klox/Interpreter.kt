@@ -95,7 +95,12 @@ class Interpreter (
     }
 
     override fun visitLogical(expr: Expr.Logical): Any? {
-        TODO("Not yet implemented")
+        val left = eval(expr.left)
+        return when (expr.op.type) {
+            Or -> if (isTruthy(left)) left else eval(expr.right)
+            And -> if (isTruthy(left)) eval(expr.right) else left
+            else -> throw Error("invalid logical operator", expr.op)
+        }
     }
 
     override fun visitSet(expr: Expr.Set): Any? {

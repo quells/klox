@@ -167,13 +167,33 @@ class Parser(private val source: String, private val tokens: List<Token>) {
     }
 
     private fun ternary(): Expr {
-        val expr = equality()
+        val expr = or()
         if (match(Question)) {
             val q = previous()
-            val l = equality()
+            val l = expression()
             val c = consume(Colon, "in ternary")
             val r = expression()
             return Expr.Ternary(expr, q, l, c, r)
+        }
+        return expr
+    }
+
+    private fun or(): Expr {
+        var expr = and()
+        while (match(Or)) {
+            val op = previous()
+            val right = and()
+            expr = Expr.Logical(expr, op, right)
+        }
+        return expr
+    }
+
+    private fun and(): Expr {
+        var expr = equality()
+        while (match(And)) {
+            val op = previous()
+            val right = equality()
+            expr = Expr.Logical(expr, op, right)
         }
         return expr
     }
