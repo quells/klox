@@ -145,7 +145,12 @@ class Interpreter (
         val outer = env
         try {
             env = inner
-            statements.forEach { execute(it) }
+            for (statement in statements) {
+                if (loop?.broken == true) {
+                    break
+                }
+                execute(statement)
+            }
         } finally {
             env = outer
         }
