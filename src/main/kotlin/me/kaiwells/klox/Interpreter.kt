@@ -187,7 +187,11 @@ class Interpreter (
     }
 
     override fun visitWhile(stmt: Stmt.While): Any? {
-        TODO("Not yet implemented")
+        var last: Any? = null
+        while (isTruthy(eval(stmt.condition))) {
+            last = execute(stmt.body)
+        }
+        return last
     }
 
     class Error(msg: String, val token: Token) : RuntimeException(msg)

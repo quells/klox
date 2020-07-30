@@ -110,6 +110,7 @@ class Parser(private val source: String, private val tokens: List<Token>) {
         return when {
             match(If) -> ifStatement()
             match(Print) -> printStatement()
+            match(While) -> whileStatement()
             match(LeftBrace) -> Stmt.Block(block())
             else -> expressionStatement()
         }
@@ -131,6 +132,14 @@ class Parser(private val source: String, private val tokens: List<Token>) {
         val value = expression()
         consume(Semicolon, "after value")
         return Stmt.Print(value)
+    }
+
+    private fun whileStatement(): Stmt {
+        consume(LeftParen, "after 'while'")
+        val condition = expression()
+        consume(RightParen, "after 'while' condition")
+        val body = statement()
+        return Stmt.While(condition, body)
     }
 
     private fun block(): List<Stmt> {

@@ -99,7 +99,7 @@ class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
         return builder.toString()
     }
     override fun visitReturn(stmt: Stmt.Return): String {
-        TODO("Not yet implemented")
+        return "return ${stmt.accept(this)};"
     }
     override fun visitVariable(stmt: Stmt.Variable): String {
         val builder = StringBuilder()
@@ -109,6 +109,6 @@ class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
         return builder.toString()
     }
     override fun visitWhile(stmt: Stmt.While): String {
-        TODO("Not yet implemented")
+        return "while ${stmt.condition.accept(this)} ${stmt.body.accept(this)}"
     }
 }
