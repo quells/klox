@@ -109,6 +109,7 @@ class Parser(private val source: String, private val tokens: List<Token>) {
     private fun statement(): Stmt {
         return when {
             match(If) -> ifStatement()
+            match(For) -> forStatement()
             match(Print) -> printStatement()
             match(While) -> whileStatement()
             match(LeftBrace) -> Stmt.Block(block())
@@ -128,9 +129,27 @@ class Parser(private val source: String, private val tokens: List<Token>) {
         return Stmt.If(condition, thenBranch, elseBranch)
     }
 
+    private fun forStatement(): Stmt {
+        consume(LeftParen, "after 'for'")
+        val initializer = when {
+            match(Semicolon) -> null
+            match(Var) -> varDeclaration()
+            else -> expressionStatement()
+        }
+        val condition = if (!check(Semicolon)) expression() else Expr.Literal(true)
+        consume(Semicolon, "after 'for' condition")
+        val increment = if (!check(RightParen)) expression() else null
+        consume(RightParen, "after 'for' increment")
+        var body = statement()
+        increment?.let { body = Stmt.Block(listOf(body, Stmt.Expression(it))) }
+        body = Stmt.While(condition, body)
+        initializer?.let { body = Stmt.Block(listOf(it, body)) }
+        return body
+    }
+
     private fun printStatement(): Stmt {
         val value = expression()
-        consume(Semicolon, "after value")
+        consume(Semicolon, "after value to print")
         return Stmt.Print(value)
     }
 
