@@ -3,6 +3,7 @@ package me.kaiwells.klox
 abstract class Stmt {
     interface Visitor<R> {
         fun visitBlock(stmt: Block): R
+        fun visitBreak(stmt: Break): R
         fun visitClass(stmt: Class): R
         fun visitExpression(stmt: Expression): R
         fun visitFunction(stmt: Function): R
@@ -18,6 +19,11 @@ abstract class Stmt {
     data class Block(val statements: List<Stmt>) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitBlock(this)
+        }
+    }
+    data class Break(val token: Token) : Stmt() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitBreak(this)
         }
     }
     data class Class(val name: Token, val superclass: Expr.Variable, val methods: List<Function>) : Stmt() {
@@ -55,7 +61,7 @@ abstract class Stmt {
             return visitor.visitVariable(this)
         }
     }
-    data class While(val condition: Expr, val body: Stmt) : Stmt() {
+    data class While(val token: Token, val condition: Expr, val body: Stmt) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitWhile(this)
         }

@@ -192,6 +192,7 @@ class Lexer(private val source: String) {
     companion object {
         val keywords = mapOf(
             "and" to And,
+            "break" to Break,
             "class" to Class,
             "else" to Else,
             "false" to False,

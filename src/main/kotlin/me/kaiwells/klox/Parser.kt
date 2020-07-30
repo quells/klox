@@ -110,6 +110,7 @@ class Parser(private val source: String, private val tokens: List<Token>) {
         return when {
             match(If) -> ifStatement()
             match(For) -> forStatement()
+            match(Break) -> breakStatement()
             match(Print) -> printStatement()
             match(While) -> whileStatement()
             match(LeftBrace) -> Stmt.Block(block())
@@ -130,6 +131,7 @@ class Parser(private val source: String, private val tokens: List<Token>) {
     }
 
     private fun forStatement(): Stmt {
+        val token = previous()
         consume(LeftParen, "after 'for'")
         val initializer = when {
             match(Semicolon) -> null
@@ -142,9 +144,15 @@ class Parser(private val source: String, private val tokens: List<Token>) {
         consume(RightParen, "after 'for' increment")
         var body = statement()
         increment?.let { body = Stmt.Block(listOf(body, Stmt.Expression(it))) }
-        body = Stmt.While(condition, body)
+        body = Stmt.While(token, condition, body)
         initializer?.let { body = Stmt.Block(listOf(it, body)) }
         return body
+    }
+
+    private fun breakStatement(): Stmt {
+        val token = previous()
+        consume(Semicolon, "after 'break'")
+        return Stmt.Break(token)
     }
 
     private fun printStatement(): Stmt {
@@ -154,11 +162,12 @@ class Parser(private val source: String, private val tokens: List<Token>) {
     }
 
     private fun whileStatement(): Stmt {
+        val token = previous()
         consume(LeftParen, "after 'while'")
         val condition = expression()
         consume(RightParen, "after 'while' condition")
         val body = statement()
-        return Stmt.While(condition, body)
+        return Stmt.While(token, condition, body)
     }
 
     private fun block(): List<Stmt> {

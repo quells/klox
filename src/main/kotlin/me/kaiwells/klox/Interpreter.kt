@@ -3,7 +3,8 @@ package me.kaiwells.klox
 import me.kaiwells.klox.Token.Type.*
 
 class Interpreter (
-        private var env: Environment = Environment()
+    private var env: Environment = Environment(),
+    private var loop: Loop? = null
 ) : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
 
     fun interpret(statements: List<Stmt>): Any? {
@@ -150,6 +151,14 @@ class Interpreter (
         }
     }
 
+    override fun visitBreak(stmt: Stmt.Break): Any? {
+        loop = loop?.let {
+            it.broken = true
+            return it
+        } ?: throw Error("break statement outside loop", stmt.token)
+        return null
+    }
+
     override fun visitClass(stmt: Stmt.Class): Any? {
         TODO("Not yet implemented")
     }
@@ -187,8 +196,13 @@ class Interpreter (
     }
 
     override fun visitWhile(stmt: Stmt.While): Any? {
+        loop = Loop(stmt.token, enclosing = loop)
         var last: Any? = null
         while (isTruthy(eval(stmt.condition))) {
+            if (loop?.broken == true) {
+                loop = loop?.enclosing
+                break
+            }
             last = execute(stmt.body)
         }
         return last

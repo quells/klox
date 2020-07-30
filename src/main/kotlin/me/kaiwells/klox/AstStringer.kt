@@ -78,6 +78,9 @@ class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
         builder.append(" }")
         return builder.toString()
     }
+    override fun visitBreak(stmt: Stmt.Break): String {
+        return "break;"
+    }
     override fun visitClass(stmt: Stmt.Class): String {
         TODO("Not yet implemented")
     }

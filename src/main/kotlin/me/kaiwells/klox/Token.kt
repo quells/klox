@@ -14,7 +14,7 @@ data class Token(
         Greater, GreaterEqual,
         Less, LessEqual,
         Identifier, String, Number,
-        And, Class, Else, False, Fun, For, If, Nil, Or, Print, Return, Super, This, True, Var, While,
+        And, Break, Class, Else, False, Fun, For, If, Nil, Or, Print, Return, Super, This, True, Var, While,
         EOF, Error, Comment
     }
 
