@@ -2,8 +2,9 @@ package me.kaiwells.klox
 
 import me.kaiwells.klox.Token.Type.*
 
-class Parser(private val tokens: List<Token>) {
+class Parser(private val source: String, private val tokens: List<Token>) {
     private var current = 0
+    private val errors = mutableListOf<Error>()
 
     fun parse(): List<Stmt> {
         return try {
@@ -93,6 +94,7 @@ class Parser(private val tokens: List<Token>) {
             if (match(Var)) varDeclaration() else statement()
         } catch (ex: Error) {
             synchronize()
+            debug(source, ex)
             null
         }
     }
@@ -106,10 +108,23 @@ class Parser(private val tokens: List<Token>) {
 
     private fun statement(): Stmt {
         return when {
+            match(If) -> ifStatement()
             match(Print) -> printStatement()
             match(LeftBrace) -> Stmt.Block(block())
             else -> expressionStatement()
         }
+    }
+
+    private fun ifStatement(): Stmt {
+        consume(LeftParen, "after 'if'")
+        val condition = expression()
+        consume(RightParen, "after 'if' condition")
+        val thenBranch = statement()
+        val elseBranch = when {
+            match(Else) -> statement()
+            else -> null
+        }
+        return Stmt.If(condition, thenBranch, elseBranch)
     }
 
     private fun printStatement(): Stmt {
@@ -231,4 +246,14 @@ class Parser(private val tokens: List<Token>) {
     }
 
     class Error(msg: String, val token: Token) : RuntimeException(msg)
+
+    private fun debug(source: String, error: Error) {
+        errors.add(error)
+
+        if (error.token.line >= 1) {
+            println(source.split('\n')[error.token.line - 1])
+            println(" ".repeat(error.token.column - 1) + "^")
+        }
+        println(error.message)
+    }
 }

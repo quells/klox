@@ -22,7 +22,7 @@ private fun run(source: String, repl: Boolean = false): Boolean {
     val tokens = Lexer(source).lex()
     var hadErrors = hadLexerErrors(source, tokens)
     try {
-        val ast = Parser(tokens).parse()
+        val ast = Parser(source, tokens).parse()
         println(astStringer.stringify(ast))
         if (!hadErrors) {
             interpreter.interpret(ast)?.let {
@@ -46,7 +46,7 @@ private fun hadLexerErrors(source: String, tokens: List<Token>): Boolean {
             println(lines[t.line - 1])
             val leadingSpaceSize = t.column - 1
             var leadingSpace = " ".repeat(leadingSpaceSize)
-            println("${leadingSpace}^")
+            println("$leadingSpace^")
             val msg = "[${t.line}:${t.column}] ${t.literal}"
             if (msg.length <= leadingSpaceSize) {
                 leadingSpace = " ".repeat(leadingSpaceSize - msg.length + 1)
@@ -80,7 +80,7 @@ private fun repl() {
         try {
             print("> ")
             val line = reader.readLine()
-            run(line)
+            run(line, repl = true)
         }
         catch (e: IllegalStateException) {
             return

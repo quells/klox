@@ -160,7 +160,11 @@ class Interpreter (
     }
 
     override fun visitIf(stmt: Stmt.If): Any? {
-        TODO("Not yet implemented")
+        return if (isTruthy(eval(stmt.condition))) {
+            execute(stmt.thenBranch)
+        } else {
+            stmt.elseBranch?.let { execute(it) }
+        }
     }
 
     override fun visitPrint(stmt: Stmt.Print): Any? {

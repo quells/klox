@@ -88,7 +88,10 @@ class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
         TODO("Not yet implemented")
     }
     override fun visitIf(stmt: Stmt.If): String {
-        TODO("Not yet implemented")
+        val builder = StringBuilder()
+        builder.append("if ").append(stmt.condition.accept(this)).append(" ").append(stmt.thenBranch.accept(this))
+        stmt.elseBranch?.let { builder.append(" else ").append(it.accept(this)) }
+        return builder.toString()
     }
     override fun visitPrint(stmt: Stmt.Print): String {
         val builder = StringBuilder()
