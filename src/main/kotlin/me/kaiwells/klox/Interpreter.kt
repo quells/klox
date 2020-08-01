@@ -3,7 +3,7 @@ package me.kaiwells.klox
 import me.kaiwells.klox.Token.Type.*
 
 class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
-    private val globals = Environment()
+    val globals = Environment()
     private var env: Environment = globals
     private var loop: Loop? = null
 
@@ -90,8 +90,8 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         if (callee !is Callable) {
             throw Error("can only call functions and classes", expr.paren)
         }
-        if (args.count() != callee.arity()) {
-            throw Error("expected ${callee.arity()} arguments but got ${args.count()}", expr.paren)
+        if (args.size != callee.arity()) {
+            throw Error("expected ${callee.arity()} arguments but got ${args.size}", expr.paren)
         }
         val function = callee as Callable
         return function.call(this, args)
@@ -155,7 +155,7 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         return null
     }
 
-    private fun executeBlock(statements: List<Stmt>, inner: Environment) {
+    fun executeBlock(statements: List<Stmt>, inner: Environment) {
         val outer = env
         try {
             env = inner
@@ -187,7 +187,9 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     }
 
     override fun visitFunction(stmt: Stmt.Function): Any? {
-        TODO("Not yet implemented")
+        val function = Function(stmt)
+        env.define(stmt.name.lexeme, function)
+        return null
     }
 
     override fun visitIf(stmt: Stmt.If): Any? {

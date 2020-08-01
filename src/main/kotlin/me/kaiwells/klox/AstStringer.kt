@@ -6,23 +6,23 @@ class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
     }
 
     private fun parenthesize(name: String, exprs: List<Expr>): String {
-        val builder = StringBuilder()
-        builder.append("(").append(name)
+        val b = StringBuilder()
+        b.append("(").append(name)
         exprs.forEach {
-            builder.append(" ").append(it.accept(this))
+            b.append(" ").append(it.accept(this))
         }
-        builder.append(")")
-        return builder.toString()
+        b.append(")")
+        return b.toString()
     }
 
     private fun parenthesize(name: String, token: Token, exprs: List<Expr>): String {
-        val builder = StringBuilder()
-        builder.append("(").append(name).append(" ").append(token.lexeme)
+        val b = StringBuilder()
+        b.append("(").append(name).append(" ").append(token.lexeme)
         exprs.forEach {
-            builder.append(" ").append(it.accept(this))
+            b.append(" ").append(it.accept(this))
         }
-        builder.append(")")
-        return builder.toString()
+        b.append(")")
+        return b.toString()
     }
 
     /* Expr.Visitor<String> */
@@ -72,11 +72,11 @@ class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
     /* Stmt.Visitor<String> */
 
     override fun visitBlock(stmt: Stmt.Block): String {
-        val builder = StringBuilder()
-        builder.append("{ ")
-        builder.append(stmt.statements.joinToString(" ") { it.accept(this) })
-        builder.append(" }")
-        return builder.toString()
+        val b = StringBuilder()
+        b.append("{ ")
+        b.append(stmt.statements.joinToString(" ") { it.accept(this) })
+        b.append(" }")
+        return b.toString()
     }
     override fun visitBreak(stmt: Stmt.Break): String {
         return "break;"
@@ -88,28 +88,34 @@ class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
         return stmt.expression.accept(this) + ";"
     }
     override fun visitFunction(stmt: Stmt.Function): String {
-        TODO("Not yet implemented")
+        val b = StringBuilder()
+        b.append("fun ${stmt.name.lexeme}(")
+        b.append(stmt.params.joinToString(", ") { it.lexeme })
+        b.append(") { ")
+        b.append(stmt.body.joinToString("; ") { it.accept(this) })
+        b.append(" }")
+        return b.toString()
     }
     override fun visitIf(stmt: Stmt.If): String {
-        val builder = StringBuilder()
-        builder.append("if ").append(stmt.condition.accept(this)).append(" ").append(stmt.thenBranch.accept(this))
-        stmt.elseBranch?.let { builder.append(" else ").append(it.accept(this)) }
-        return builder.toString()
+        val b = StringBuilder()
+        b.append("if ").append(stmt.condition.accept(this)).append(" ").append(stmt.thenBranch.accept(this))
+        stmt.elseBranch?.let { b.append(" else ").append(it.accept(this)) }
+        return b.toString()
     }
     override fun visitPrint(stmt: Stmt.Print): String {
-        val builder = StringBuilder()
-        builder.append("print ").append(stmt.expression.accept(this)).append(';')
-        return builder.toString()
+        val b = StringBuilder()
+        b.append("print ").append(stmt.expression.accept(this)).append(';')
+        return b.toString()
     }
     override fun visitReturn(stmt: Stmt.Return): String {
         return "return ${stmt.accept(this)};"
     }
     override fun visitVariable(stmt: Stmt.Variable): String {
-        val builder = StringBuilder()
-        builder.append("var ").append(stmt.name.lexeme)
-        stmt.initializer?.let { builder.append(" = ").append(it.accept(this)) }
-        builder.append(';')
-        return builder.toString()
+        val b = StringBuilder()
+        b.append("var ").append(stmt.name.lexeme)
+        stmt.initializer?.let { b.append(" = ").append(it.accept(this)) }
+        b.append(';')
+        return b.toString()
     }
     override fun visitWhile(stmt: Stmt.While): String {
         return "while ${stmt.condition.accept(this)} ${stmt.body.accept(this)}"

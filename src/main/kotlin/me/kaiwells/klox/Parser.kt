@@ -93,12 +93,37 @@ class Parser(private val source: String, private val tokens: List<Token>) {
 
     private fun declaration(): Stmt? {
         return try {
-            if (match(Var)) varDeclaration() else statement()
+            when {
+                match(Fun) -> funDeclaration("function")
+                match(Var) -> varDeclaration()
+                else -> statement()
+            }
         } catch (err: Error) {
             synchronize()
             errors.add(err)
             null
         }
+    }
+
+    private fun funDeclaration(kind: String): Stmt {
+        val name = consume(Identifier, "for $kind name")
+
+        consume(LeftParen, "after $kind name")
+        val params = mutableListOf<Token>()
+        if (!check(RightParen)) {
+            do {
+                if (params.size >= 255) {
+                    errors.add(Error("cannot have more than 255 parameters", peek()))
+                }
+                params.add(consume(Identifier, "parameter name"))
+            } while (match(Comma))
+        }
+        consume(RightParen, "after $kind parameters")
+
+        consume(LeftBrace, "after $kind parameters")
+        val body = block() // includes trailing RightBrace
+
+        return Stmt.Function(name, params, body)
     }
 
     private fun varDeclaration(): Stmt {
@@ -298,7 +323,7 @@ class Parser(private val source: String, private val tokens: List<Token>) {
         val arguments = mutableListOf<Expr>()
         if (!check(RightParen)) {
             do {
-                if (arguments.count() >= 255) {
+                if (arguments.size >= 255) {
                     errors.add(Error("cannot have more than 255 arguments", peek()))
                     synchronize()
                 }

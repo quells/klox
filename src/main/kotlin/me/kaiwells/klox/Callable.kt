@@ -42,3 +42,19 @@ class Exit : Callable {
         return "<native fn>"
     }
 }
+
+class Function(private val declaration: Stmt.Function) : Callable {
+
+    override fun arity(): Int {
+        return declaration.params.size
+    }
+
+    override fun call(i: Interpreter, args: List<Any?>): Any? {
+        val env = Environment(enclosing = interpreter.globals)
+        declaration.params.forEachIndexed { idx, param ->
+            env.define(param.lexeme, args[idx])
+        }
+        i.executeBlock(declaration.body, env)
+        return null
+    }
+}
