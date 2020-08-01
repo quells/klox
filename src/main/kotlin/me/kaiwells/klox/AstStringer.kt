@@ -108,7 +108,10 @@ class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
         return b.toString()
     }
     override fun visitReturn(stmt: Stmt.Return): String {
-        return "return ${stmt.accept(this)};"
+        val b = StringBuilder()
+        b.append("return")
+        stmt.value?.let { b.append(" ").append(it.accept(this)) }
+        return b.toString()
     }
     override fun visitVariable(stmt: Stmt.Variable): String {
         val b = StringBuilder()

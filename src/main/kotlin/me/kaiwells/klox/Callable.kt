@@ -54,7 +54,15 @@ class Function(private val declaration: Stmt.Function) : Callable {
         declaration.params.forEachIndexed { idx, param ->
             env.define(param.lexeme, args[idx])
         }
-        i.executeBlock(declaration.body, env)
+        try {
+            i.executeBlock(declaration.body, env)
+        } catch (ret: Interpreter.Return) {
+            return ret.value
+        }
         return null
+    }
+
+    override fun toString(): String {
+        return "<${declaration.name.lexeme}>"
     }
 }

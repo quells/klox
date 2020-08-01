@@ -51,7 +51,7 @@ abstract class Stmt {
             return visitor.visitPrint(this)
         }
     }
-    data class Return(val keyword: Token, val value: Expr) : Stmt() {
+    data class Return(val keyword: Token, val value: Expr?) : Stmt() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitReturn(this)
         }

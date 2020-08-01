@@ -139,6 +139,7 @@ class Parser(private val source: String, private val tokens: List<Token>) {
             match(For) -> forStatement()
             match(Break) -> breakStatement()
             match(Print) -> printStatement()
+            match(Return) -> returnStatement()
             match(While) -> whileStatement()
             match(LeftBrace) -> Stmt.Block(block())
             else -> expressionStatement()
@@ -186,6 +187,13 @@ class Parser(private val source: String, private val tokens: List<Token>) {
         val value = expression()
         consume(Semicolon, "after value to print")
         return Stmt.Print(value)
+    }
+
+    private fun returnStatement(): Stmt {
+        val keyword = previous()
+        val value = if (check(Semicolon)) null else expression()
+        consume(Semicolon, "after 'return'")
+        return Stmt.Return(keyword, value)
     }
 
     private fun whileStatement(): Stmt {

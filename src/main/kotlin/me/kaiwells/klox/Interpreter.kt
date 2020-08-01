@@ -207,7 +207,8 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     }
 
     override fun visitReturn(stmt: Stmt.Return): Any? {
-        TODO("Not yet implemented")
+        val value = stmt.value?.let { eval(it) }
+        throw Return(value)
     }
 
     override fun visitVariable(stmt: Stmt.Variable): Any? {
@@ -230,4 +231,6 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     }
 
     class Error(msg: String, val token: Token) : RuntimeException(msg)
+
+    class Return(val value: Any?) : RuntimeException()
 }
