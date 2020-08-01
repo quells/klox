@@ -6,13 +6,15 @@ class Parser(private val source: String, private val tokens: List<Token>) {
     private var current = 0
     private val errors = mutableListOf<Error>()
 
-    fun parse(): List<Stmt> {
+    data class Result(val statements: List<Stmt>, val errors: List<Error>)
+
+    fun parse(): Result {
         return try {
             val statements = mutableListOf<Stmt>()
             while (!atEnd()) {
                 declaration()?.let { statements.add(it) }
             }
-            statements
+            Result(statements, errors)
         } catch (e: Error) {
             val t = peek()
             throw Error("[${t.line}:${t.column}] Error: ${e.message}, found ${t.type}", peek())
@@ -92,9 +94,9 @@ class Parser(private val source: String, private val tokens: List<Token>) {
     private fun declaration(): Stmt? {
         return try {
             if (match(Var)) varDeclaration() else statement()
-        } catch (ex: Error) {
+        } catch (err: Error) {
             synchronize()
-            debug(source, ex)
+            errors.add(err)
             null
         }
     }
@@ -303,14 +305,4 @@ class Parser(private val source: String, private val tokens: List<Token>) {
     }
 
     class Error(msg: String, val token: Token) : RuntimeException(msg)
-
-    private fun debug(source: String, error: Error) {
-        errors.add(error)
-
-        if (error.token.line >= 1) {
-            println(source.split('\n')[error.token.line - 1])
-            println(" ".repeat(error.token.column - 1) + "^")
-        }
-        println(error.message)
-    }
 }

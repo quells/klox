@@ -23,9 +23,10 @@ private fun run(source: String, repl: Boolean = false): Boolean {
     var hadErrors = hadLexerErrors(source, tokens)
     try {
         val ast = Parser(source, tokens).parse()
-        println(astStringer.stringify(ast))
-        if (!hadErrors) {
-            interpreter.interpret(ast)?.let {
+        println(astStringer.stringify(ast.statements))
+        ast.errors.forEach { handleParserError(source, it) }
+        if (!hadErrors && ast.errors.isEmpty()) {
+            interpreter.interpret(ast.statements)?.let {
                 if (repl) println(it)
             }
         }
