@@ -2,10 +2,15 @@ package me.kaiwells.klox
 
 import me.kaiwells.klox.Token.Type.*
 
-class Interpreter (
-    private var env: Environment = Environment(),
+class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
+    private val globals = Environment()
+    private var env: Environment = globals
     private var loop: Loop? = null
-) : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
+
+    init {
+        globals.define("clock", Clock())
+        globals.define("exit", Exit())
+    }
 
     fun interpret(statements: List<Stmt>): Any? {
         // return the result of the last statement
@@ -80,7 +85,16 @@ class Interpreter (
     }
 
     override fun visitCall(expr: Expr.Call): Any? {
-        TODO("Not yet implemented")
+        val callee = eval(expr.callee)
+        val args = expr.args.map { eval(it) }
+        if (callee !is Callable) {
+            throw Error("can only call functions and classes", expr.paren)
+        }
+        if (args.count() != callee.arity()) {
+            throw Error("expected ${callee.arity()} arguments but got ${args.count()}", expr.paren)
+        }
+        val function = callee as Callable
+        return function.call(this, args)
     }
 
     override fun visitGet(expr: Expr.Get): Any? {
