@@ -187,7 +187,7 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     }
 
     override fun visitFunction(stmt: Stmt.Function): Any? {
-        val function = Function(stmt)
+        val function = Function(stmt, env)
         env.define(stmt.name.lexeme, function)
         return null
     }
