@@ -38,6 +38,15 @@ class AstStringer : Expr.Visitor<String>, Stmt.Visitor<String> {
         exprs.addAll(expr.args)
         return parenthesize("call", exprs)
     }
+    override fun visitFunction(expr: Expr.Function): String {
+        val b = StringBuilder()
+        b.append("fun (")
+        b.append(expr.params.joinToString(", ") { it.lexeme })
+        b.append(") { ")
+        b.append(expr.body.joinToString("; ") { it.accept(this) })
+        b.append(" }")
+        return b.toString()
+    }
     override fun visitGet(expr: Expr.Get): String {
         return parenthesize("get", expr.name, listOf(expr.obj))
     }

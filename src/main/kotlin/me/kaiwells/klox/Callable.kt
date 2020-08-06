@@ -44,21 +44,23 @@ class Exit : Callable {
 }
 
 class Function(
-        private val declaration: Stmt.Function,
-        private val closure: Environment
+    private val name: Token,
+    private val params: List<Token>,
+    private val body: List<Stmt>,
+    private val closure: Environment
 ) : Callable {
 
     override fun arity(): Int {
-        return declaration.params.size
+        return params.size
     }
 
     override fun call(i: Interpreter, args: List<Any?>): Any? {
         val env = Environment(enclosing = closure)
-        declaration.params.forEachIndexed { idx, param ->
+        params.forEachIndexed { idx, param ->
             env.define(param.lexeme, args[idx])
         }
         try {
-            i.executeBlock(declaration.body, env)
+            i.executeBlock(body, env)
         } catch (ret: Interpreter.Return) {
             return ret.value
         }
@@ -66,6 +68,6 @@ class Function(
     }
 
     override fun toString(): String {
-        return "<fn ${declaration.name.lexeme}>"
+        return "<fn ${name.lexeme}>"
     }
 }

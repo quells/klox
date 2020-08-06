@@ -93,8 +93,14 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         if (args.size != callee.arity()) {
             throw Error("expected ${callee.arity()} arguments but got ${args.size}", expr.paren)
         }
-        val function = callee as Callable
-        return function.call(this, args)
+        return callee.call(this, args)
+    }
+
+    override fun visitFunction(expr: Expr.Function): Any? {
+        val name = "anonymous"
+        val function = Function(Token(Identifier, name), expr.params, expr.body, env)
+        env.define(name, function)
+        return function
     }
 
     override fun visitGet(expr: Expr.Get): Any? {
@@ -187,7 +193,7 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     }
 
     override fun visitFunction(stmt: Stmt.Function): Any? {
-        val function = Function(stmt, env)
+        val function = Function(stmt.name, stmt.params, stmt.body, env)
         env.define(stmt.name.lexeme, function)
         return null
     }

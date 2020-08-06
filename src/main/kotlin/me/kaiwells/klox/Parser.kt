@@ -106,9 +106,21 @@ class Parser(private val source: String, private val tokens: List<Token>) {
     }
 
     private fun funDeclaration(kind: String): Stmt {
-        val name = consume(Identifier, "for $kind name")
+        var _kind = kind
+        val name = if (match(Identifier)) {
+            previous()
+        } else {
+            _kind = "anonymous function"
+            null
+        }
+        val def = funDefinition(_kind)
+        return name?.let {
+            Stmt.Function(it, def.params, def.body)
+        } ?: Stmt.Expression(def)
+    }
 
-        consume(LeftParen, "after $kind name")
+    private fun funDefinition(kind: String): Expr.Function {
+        consume(LeftParen, "before $kind parameters")
         val params = mutableListOf<Token>()
         if (!check(RightParen)) {
             do {
@@ -123,7 +135,7 @@ class Parser(private val source: String, private val tokens: List<Token>) {
         consume(LeftBrace, "after $kind parameters")
         val body = block() // includes trailing RightBrace
 
-        return Stmt.Function(name, params, body)
+        return Expr.Function(params, body)
     }
 
     private fun varDeclaration(): Stmt {
@@ -354,8 +366,9 @@ class Parser(private val source: String, private val tokens: List<Token>) {
                 consume(RightParen, "after expression")
                 Expr.Grouping(e)
             }
+            match(Fun) -> funDefinition("anonymous function")
             else -> {
-                throw Error("expected one of false, true, nil, NUMBER, STRING, VARIABLE, ( for expression", peek())
+                throw Error("expected one of false, true, nil, NUMBER, STRING, VARIABLE, anonymous function, ( for expression", peek())
             }
         }
     }

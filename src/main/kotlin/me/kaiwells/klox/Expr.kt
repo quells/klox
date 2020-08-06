@@ -5,6 +5,7 @@ abstract class Expr {
         fun visitAssign(expr: Assign): R
         fun visitBinary(expr: Binary): R
         fun visitCall(expr: Call): R
+        fun visitFunction(expr: Function): R
         fun visitGet(expr: Get): R
         fun visitGrouping(expr: Grouping): R
         fun visitLiteral(expr: Literal): R
@@ -32,6 +33,11 @@ abstract class Expr {
     data class Call(val callee: Expr, val paren: Token, val args: List<Expr>) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitCall(this)
+        }
+    }
+    data class Function(val params: List<Token>, val body: List<Stmt>) : Expr() {
+        override fun <R> accept(visitor: Visitor<R>): R {
+            return visitor.visitFunction(this)
         }
     }
     data class Get(val obj: Expr, val name: Token) : Expr() {
